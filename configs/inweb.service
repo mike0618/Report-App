@@ -1,0 +1,14 @@
+[Unit]
+Description=Gunicorn instance to serve mikedrun
+After=network.target
+
+[Service]
+User=miked
+Group=www-data
+WorkingDirectory=/home/miked/mikedrun
+Environment="PATH=/home/miked/mikedrun/venv/bin"
+ExecStart=/home/miked/mikedrun/venv/bin/gunicorn -c gunicorn_config.py wsgi:app
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
