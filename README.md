@@ -4,7 +4,7 @@ A web application collecting data from various sensors and sources to store it o
 
 ## Technologies
 - nginx web server
-- PostrgeSQL database
+- SQLite/PostrgeSQL database
 - Flask web microframework
 - Data visualization libraries
 
@@ -14,6 +14,7 @@ A web application collecting data from various sensors and sources to store it o
 - [x] Set up Gunicorn WSGI server
 - [x] Set up an SSL certificate
 - [x] The "Coming Soon" page is available at [miked.run.place](https://www.miked.run.place)
+- [x] Build SQLite DB [db_orm.py](./db_orm.py)
 
 ## Hosting
 
