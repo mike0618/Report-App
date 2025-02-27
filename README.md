@@ -6,7 +6,7 @@ A web application collecting data from various sensors and sources to store it o
 - nginx web server
 - SQLite/PostrgeSQL database
 - Flask web microframework
-- Data visualization libraries
+- Data visualization libraries - Bootstrap template with GraphJS with HTMX
 
 ## Progress
 - [x] Set up Nginx web server
@@ -15,6 +15,8 @@ A web application collecting data from various sensors and sources to store it o
 - [x] Set up an SSL certificate
 - [x] The "Coming Soon" page is available at [miked.run.place](https://www.miked.run.place)
 - [x] Build SQLite DB [db_orm.py](./db_orm.py)
+- [x] Bootstrap Dashboard added
+- [x] HTMX live graph update added
 
 ## Hosting
 
