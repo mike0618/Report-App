@@ -1,7 +1,7 @@
 import eventlet
 
 bind = "unix:mikedrun.sock"
-workers = 3
+workers = 1
 worker_class = "eventlet"
 timeout = 60
 daemon = False

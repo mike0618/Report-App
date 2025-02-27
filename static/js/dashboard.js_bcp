@@ -1,0 +1,61 @@
+/* /* globals Chart:false */ */
+/* (() => { */
+/*   'use strict' */
+/*   // Graphs */
+/*   const ctx = document.getElementById('myChart').getContext('2d'); */
+/*   var myChart = new Chart(ctx, { */
+/*     type: 'line', */
+/*     data: { */
+/*       labels: ["test",], */
+/*       datasets: [{ */
+/*         data: [0,], */
+/*         lineTension: 0, */
+/*         backgroundColor: 'transparent', */
+/*         borderColor: '#007bff', */
+/*         borderWidth: 4, */
+/*         pointBackgroundColor: '#007bff' */
+/*       }] */
+/*     }, */
+/*     options: { */
+/*       plugins: { */
+/*         legend: { */
+/*           display: false */
+/*         }, */
+/*         tooltip: { */
+/*           boxPadding: 3 */
+/*         } */
+/*       } */
+/*     } */
+/*   }); */
+/*   document.addEventListener('htmx:afterSwap', function (event) { */
+/*     if (event.target.id === 'chart-container') { */
+/*       const response = JSON.parse(event.detail.xhr.response); */
+/*       myChart.data.labels.push(response.labels) */
+/*       myChart.data.datasets.data.push(response.data) */
+/*     } */
+/*   }) */
+/* })() */
+
+var ctx = document.getElementById("myChart").getContext("2d");
+var chart = new Chart(ctx, {
+    type: "line",
+    data: {
+        labels: [],
+        datasets: [{ label: "HTMX Data", data: [], borderColor: "green", fill: false }]
+    },
+    options: { responsive: true, scales: { x: { type: "linear" }, y: { beginAtZero: true } } }
+});
+
+document.addEventListener("htmx:afterSwap", function(event) {
+    if (event.detail.target.id === "chart-container") {
+        var data = JSON.parse(event.detail.target.innerText);
+        chart.data.labels.push(new Date(data.timestamp * 1000).toLocaleTimeString());
+        chart.data.datasets[0].data.push(data.value);
+
+        if (chart.data.labels.length > 10) {
+            chart.data.labels.shift();
+            chart.data.datasets[0].data.shift();
+        }
+        chart.update();
+    }
+});

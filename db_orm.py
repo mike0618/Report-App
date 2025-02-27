@@ -2,7 +2,7 @@
 This module contains DDL commands
 Run it first time directly to create tables
 
-4 Tables are here:
+5 Tables are here:
 
 User
 id: int - primary_key
@@ -37,6 +37,12 @@ value: float
 owner_id: int - foreign key of user
 place_id: int - foreign key of place
 sensor_id: int - foreign key of sensor
+
+Share
+id: int - primary_key
+owner_id: int - foreign key of who shared the sensor
+sensor_id: int - foreign key of sensor
+user_id: int - foreign key of who the sensor is shared with
 """
 
 from typing_extensions import List
@@ -101,6 +107,14 @@ class User(UserMixin, Common):  # a class represents a table
         back_populates="owner",
         cascade="all, delete",
     )
+    shared: Mapped[List["Share"]] = relationship(
+        back_populates="author",  # back_populates place in Sensor table with this place
+        cascade="all, delete",  # if a place is deleted, all its sensors are deleted
+    )
+    shared_with: Mapped[List["Share"]] = relationship(
+        back_populates="user",  # back_populates place in Sensor table with this place
+        cascade="all, delete",  # if a place is deleted, all its sensors are deleted
+    )
 
 
 class Place(Common):
@@ -124,8 +138,12 @@ class Sensor(Common):
     owner_id: Mapped[int] = mapped_column(ForeignKey(User.id))
     owner = relationship("User", back_populates="sensors")
     place_id: Mapped[int] = mapped_column(ForeignKey(Place.id))
-    place: Mapped["Place"] = relationship(back_populates="sensors")
+    place = relationship("Place", back_populates="sensors")
     data: Mapped[List["Data"]] = relationship(
+        back_populates="sensor",  # back_populates place in Sensor table with this place
+        cascade="all, delete",  # if a place is deleted, all its sensors are deleted
+    )
+    share: Mapped[List["Share"]] = relationship(
         back_populates="sensor",  # back_populates place in Sensor table with this place
         cascade="all, delete",  # if a place is deleted, all its sensors are deleted
     )
@@ -136,9 +154,18 @@ class Data(Common):
     owner_id: Mapped[int] = mapped_column(ForeignKey(User.id))
     owner = relationship("User", back_populates="data")
     place_id: Mapped[int] = mapped_column(ForeignKey(Place.id))
-    place: Mapped["Place"] = relationship(back_populates="data")
+    place = relationship("Place", back_populates="data")
     sensor_id: Mapped[int] = mapped_column(ForeignKey(Sensor.id))
-    sensor: Mapped["Sensor"] = relationship(back_populates="data")
+    sensor = relationship("Sensor", back_populates="data")
+
+
+class Share(Common):
+    owner_id: Mapped[int] = mapped_column(ForeignKey(User.id))
+    owner = relationship("User", back_populates="shared")
+    sensor_id: Mapped[int] = mapped_column(ForeignKey(Sensor.id))
+    sensor = relationship("Sensor", back_populates="share")
+    user_id: Mapped[int] = mapped_column(ForeignKey(User.id))
+    user = relationship("User", back_populates="shared_with")
 
 
 if __name__ == "__main__":
