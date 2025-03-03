@@ -2,7 +2,9 @@
 <html lang="en" data-bs-theme="auto">
 
 <head>
+  <script src="https://unpkg.com/htmx.org@2.0.4"></script>
   <script src="static/js/color-modes.js"></script>
+  <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js"></script>
 
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -170,7 +172,7 @@
   </svg>
 
   <header class="navbar sticky-top bg-dark flex-md-nowrap p-0 shadow" data-bs-theme="dark">
-    <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3 fs-6 text-white" href="#">PHREC</a>
+    <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3 fs-6 text-white" href="#">DataApp</a>
 
     <ul class="navbar-nav flex-row d-md-none">
       <li class="nav-item text-nowrap">
@@ -184,9 +186,7 @@
       <li class="nav-item text-nowrap">
         <button class="nav-link px-3 text-white" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu"
           aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
-          <svg class="bi">
-            <use xlink:href="#list" />
-          </svg>
+          <i class="fa-solid fa-list"></i>
         </button>
       </li>
     </ul>
@@ -202,7 +202,7 @@
         <div class="offcanvas-md offcanvas-end bg-body-tertiary" tabindex="-1" id="sidebarMenu"
           aria-labelledby="sidebarMenuLabel">
           <div class="offcanvas-header">
-            <h5 class="offcanvas-title" id="sidebarMenuLabel">PHREC</h5>
+            <h5 class="offcanvas-title" id="sidebarMenuLabel">DataApp</h5>
             <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#sidebarMenu"
               aria-label="Close"></button>
           </div>
@@ -210,94 +210,36 @@
             <ul class="nav flex-column">
               <li class="nav-item">
                 <a class="nav-link d-flex align-items-center gap-2 active" aria-current="page" href="#">
-                  <svg class="bi">
-                    <use xlink:href="#house-fill" />
-                  </svg>
+                  <i class="fa-solid fa-house"></i>
                   Dashboard
-                </a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link d-flex align-items-center gap-2" href="#">
-                  <svg class="bi">
-                    <use xlink:href="#file-earmark" />
-                  </svg>
-                  Orders
-                </a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link d-flex align-items-center gap-2" href="#">
-                  <svg class="bi">
-                    <use xlink:href="#cart" />
-                  </svg>
-                  Products
-                </a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link d-flex align-items-center gap-2" href="#">
-                  <svg class="bi">
-                    <use xlink:href="#people" />
-                  </svg>
-                  Customers
-                </a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link d-flex align-items-center gap-2" href="#">
-                  <svg class="bi">
-                    <use xlink:href="#graph-up" />
-                  </svg>
-                  Reports
-                </a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link d-flex align-items-center gap-2" href="#">
-                  <svg class="bi">
-                    <use xlink:href="#puzzle" />
-                  </svg>
-                  Integrations
                 </a>
               </li>
             </ul>
 
             <h6
               class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-body-secondary text-uppercase">
-              <span>Saved reports</span>
+              <span>My Places</span>
               <a class="link-secondary" href="#" aria-label="Add a new report">
-                <svg class="bi">
-                  <use xlink:href="#plus-circle" />
-                </svg>
+                <i class="fa-solid fa-plus"></i>
               </a>
             </h6>
             <ul class="nav flex-column mb-auto">
               <li class="nav-item">
                 <a class="nav-link d-flex align-items-center gap-2" href="#">
-                  <svg class="bi">
-                    <use xlink:href="#file-earmark-text" />
-                  </svg>
-                  Current month
+                  <i class="fa-solid fa-location-dot"></i>
+                  WNCC
                 </a>
               </li>
               <li class="nav-item">
                 <a class="nav-link d-flex align-items-center gap-2" href="#">
-                  <svg class="bi">
-                    <use xlink:href="#file-earmark-text" />
-                  </svg>
-                  Last quarter
+                  <i class="fa-solid fa-location-dot"></i>
+                  PHREC
                 </a>
               </li>
               <li class="nav-item">
                 <a class="nav-link d-flex align-items-center gap-2" href="#">
-                  <svg class="bi">
-                    <use xlink:href="#file-earmark-text" />
-                  </svg>
-                  Social engagement
-                </a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link d-flex align-items-center gap-2" href="#">
-                  <svg class="bi">
-                    <use xlink:href="#file-earmark-text" />
-                  </svg>
-                  Year-end sale
+                  <i class="fa-solid fa-location-dot"></i>
+                  Home
                 </a>
               </li>
             </ul>
@@ -306,20 +248,29 @@
 
             <ul class="nav flex-column mb-auto">
               <li class="nav-item">
+                {% if current_user.is_authenticated and current_user.id == 1 %}
                 <a class="nav-link d-flex align-items-center gap-2" href="#">
-                  <svg class="bi">
-                    <use xlink:href="#gear-wide-connected" />
-                  </svg>
+                  <i class="fa-solid fa-user-gear"></i>
                   Settings
                 </a>
+                {% endif %}
               </li>
               <li class="nav-item">
+                {% if current_user.is_authenticated %}
                 <a class="nav-link d-flex align-items-center gap-2" href="#">
-                  <svg class="bi">
-                    <use xlink:href="#door-closed" />
-                  </svg>
+                  <i class="fa-solid fa-arrow-right-from-bracket"></i>
                   Sign out
                 </a>
+                {% else %}
+                <a class="nav-link d-flex align-items-center gap-2" href="#">
+                  <i class="fa-solid fa-address-card"></i>
+                  Register
+                </a>
+                <a class="nav-link d-flex align-items-center gap-2" href="#">
+                  <i class="fa-solid fa-arrow-right-to-bracket"></i>
+                  Sign in
+                </a>
+                {% endif %}
               </li>
             </ul>
           </div>

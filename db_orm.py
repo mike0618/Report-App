@@ -59,7 +59,7 @@ import matplotlib.image as mpi
 from eralchemy import render_er
 
 app = Flask("Data App")  # create the app
-app.secret_key = token_hex()  # a random session secret key
+# app.secret_key = token_hex()  # a random session secret key
 # configure the SQLite database, relative to the app instance folder
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///data_app.sqlite"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False  # To prevent overhead

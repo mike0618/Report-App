@@ -8,15 +8,12 @@
         <button type="button" class="btn btn-sm btn-outline-secondary">Export</button>
       </div>
       <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle d-flex align-items-center gap-1">
-        <svg class="bi">
-          <use xlink:href="#calendar3" />
-        </svg>
+        <i class="fa-regular fa-calendar-days"></i>
         This week
       </button>
     </div>
   </div>
 
-  <script src="https://unpkg.com/htmx.org@2.0.4"></script>
   <div hx-get="/data" hx-trigger="load, every 5s" hx-swap="none" hx-target="#chart-container"></div>
   <div id="chart-container">
     <canvas class="my-4 w-100" id="myChart" width="900" height="380"></canvas>
