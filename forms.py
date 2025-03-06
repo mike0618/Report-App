@@ -11,42 +11,51 @@ from wtforms import (
 )
 from wtforms.validators import DataRequired, Length
 
+
 # WTForm
+class CommonForm(FlaskForm):
+    name = StringField("Name", validators=[DataRequired()])
+    desc = StringField("Description")
 
 
 class RegisterForm(FlaskForm):
-    email = StringField("Email", validators=[DataRequired()])
-    name = StringField("Name", validators=[DataRequired()])
-    lastname = StringField("Last Name")
-    desc = StringField("Description")
-    password = PasswordField("Password", validators=[DataRequired(), Length(8)])
-    submit = SubmitField("Register")
+    email = StringField(
+        "Email", validators=[DataRequired()], render_kw={"placeholder": "Email"}
+    )
+    name = StringField(
+        "Name", validators=[DataRequired()], render_kw={"placeholder": "Name"}
+    )
+    lastname = StringField("Last Name", render_kw={"placeholder": "Last Name"})
+    password = PasswordField(
+        "Password",
+        validators=[DataRequired(), Length(8)],
+        render_kw={"placeholder": "Password"},
+    )
+    submit = SubmitField("Sign up")
 
 
-class PlaceForm(FlaskForm):
-    name = StringField("Name", validators=[DataRequired()])
-    desc = StringField("Description")
+class PlaceForm(CommonForm):
     submit = SubmitField("Add")
 
 
-class SensorForm(FlaskForm):
-    name = StringField("Name", validators=[DataRequired()])
-    desc = StringField("Description")
-    conf = StringField("Configuration")
+class SensorForm(CommonForm):
+    topic = StringField("MQTT Topic", validators=[DataRequired()])
     submit = SubmitField("Add")
 
 
 class LoginForm(FlaskForm):
-    email = StringField("Email", validators=[DataRequired()])
-    password = PasswordField("Password", validators=[DataRequired()])
-    submit = SubmitField("Enter")
+    email = StringField(
+        "Email", validators=[DataRequired()], render_kw={"placeholder": "Email"}
+    )
+    password = PasswordField(
+        "Password", validators=[DataRequired()], render_kw={"placeholder": "Password"}
+    )
+    submit = SubmitField("Sign in")
 
 
-class PersonalForm(FlaskForm):
+class PersonalForm(CommonForm):
     email = StringField("Email", validators=[DataRequired()])
-    name = StringField("Name", validators=[DataRequired()])
     lastname = StringField("Last Name")
-    desc = StringField("Description")
     old_password = PasswordField(
         "Old Password (leave it blank if you don't need to change)"
     )
@@ -54,9 +63,8 @@ class PersonalForm(FlaskForm):
     submit = SubmitField("Save")
 
 
-class PersonalFormAdmin(FlaskForm):
+class PersonalFormAdmin(CommonForm):
     email = StringField("Email", validators=[DataRequired()])
-    name = StringField("Name", validators=[DataRequired()])
     lastname = StringField("Last Name")
     access = BooleanField("Read Access")
     submit = SubmitField("Save")

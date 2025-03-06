@@ -3,6 +3,7 @@ from random import randint
 from db_orm import app, db, User, Place, Sensor, Data, Share
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
+from db_orm import mqtt
 from flask import (
     flash,
     jsonify,
@@ -29,6 +30,12 @@ from forms import (
 )
 
 
+@mqtt.on_message()
+def on_message(client, userdata, message):
+    print(message.topic)
+    print(message.payload.decode())
+
+
 login_manager = LoginManager()
 login_manager.init_app(app)
 
@@ -37,11 +44,6 @@ login_manager.init_app(app)
 @login_manager.user_loader
 def load_user(user_id):
     return db.get_or_404(User, user_id)
-
-
-# Current date and time
-def date_time():
-    return datetime.now().strftime("%m/%d/%Y, %I:%M:%S %p")
 
 
 # Year for all templates
@@ -60,7 +62,9 @@ def favicon():
 
 
 @app.route("/")
-def index():
+def home():
+    if not current_user.is_authenticated:
+        return redirect(url_for("signin"))
     return render_template("index.html")
 
 
@@ -81,8 +85,8 @@ def data():
 
 
 # this route works with GET and POST methods
-@app.route("/register", methods=["GET", "POST"])
-def register():
+@app.route("/signup", methods=["GET", "POST"])
+def signup():
     form = RegisterForm()  # use form from the forms module
     if form.validate_on_submit():  # when validated it comes via POST method
         email = form.email.data
@@ -90,6 +94,7 @@ def register():
         # SELECT * FROM User WHERE email=email;
         if db.session.query(User).filter_by(email=email).first():
             flash("This account already exists. Try to login please.")
+            print("This account already exists. Try to login please.")
             # offer to try login if exists
             return redirect(url_for("login", email=email))
         user_hash = generate_password_hash(
@@ -100,9 +105,8 @@ def register():
         new_user.email = str(email)
         new_user.name = str(form.name.data)
         new_user.lastname = str(form.lastname.data)
-        new_user.desc = str(form.desc.data)
         new_user.password = user_hash
-        new_user.date = date_time()
+        new_user.date = datetime.now()
         # add the user to the DB and commit changes
         # INSERT INTO User (columns) VALUES (values);
         new_user.save()
@@ -110,11 +114,11 @@ def register():
         # if registered and login successfully the user redirected to the personal page
         return redirect(url_for("home"))
     # if it's GET method, register page opened with the form
-    return render_template("register.html", form=form)
+    return render_template("signup.html", form=form)
 
 
-@app.route("/login", methods=["GET", "POST"])
-def login():
+@app.route("/signin", methods=["GET", "POST"])
+def signin():
     form = LoginForm()
     email = request.args.get("email")
     if email:  # check if email was send in the link and add it to the form
@@ -133,7 +137,7 @@ def login():
         login_user(user)
         return redirect(url_for("home"))
     # if it's GET, show login page with the form
-    return render_template("login.html", form=form)
+    return render_template("signin.html", form=form)
 
 
 @app.route("/logout")  # this is obviously a logout function
@@ -189,7 +193,7 @@ def add_place():
         # save the data from the form, hash and date
         new_place.name = str(form.name.data)
         new_place.desc = str(form.desc.data)
-        new_place.date = date_time()
+        new_place.date = datetime.now()
         new_place.owner = current_user
         new_place.save()
     return redirect(url_for("home"))
@@ -205,8 +209,8 @@ def add_sensor(place_id):
         # save the data from the form, hash and date
         new_sensor.name = str(form.name.data)
         new_sensor.desc = str(form.desc.data)
-        new_sensor.conf = str(form.conf.data)
-        new_sensor.date = date_time()
+        new_sensor.topic = str(form.topic.data)
+        new_sensor.date = datetime.now()
         new_sensor.owner = current_user
         new_sensor.place_id = place_id
         new_sensor.save()
@@ -222,7 +226,7 @@ def add_share(sensor_id, user_id):
         new_share = Share()
         new_share.sensor_id = sensor_id
         new_share.user_id = user_id
-        new_share.date = date_time()
+        new_share.date = datetime.now()
         new_share.owner = current_user
         new_share.save()
     return redirect(url_for("home"))

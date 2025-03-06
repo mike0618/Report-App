@@ -1,0 +1,22 @@
+{% import "bootstrap/wtf.html" as wtf %}
+{%include "head.html"%}
+
+<body class="d-flex align-items-center py-4 bg-body-tertiary">
+  {%include "colormode.html"%}
+  <main class="form-signin w-100 m-auto">
+    <!-- <img class="mb-4" src="/docs/5.3/assets/brand/bootstrap-logo.svg" alt="" width="72" height="57"> -->
+    <h1 class="h3 mb-3 fw-normal">Please sign up</h1>
+    {{ wtf.quick_form(form, novalidate=True, button_map={"submit": "success w-100"}) }}
+    <hr>
+    <h1 class="h3 mb-3 fw-normal">Already registered?</h1>
+    <a class="btn btn-primary w-100 py-2" role="button" href="{{ url_for('signin') }}">Sign
+      in</a>
+    <p class="mt-5 mb-3 text-body-secondary">&copy; Miked PHREC WNCC 2024–{{year}}</p>
+  </main>
+  <script src="static/js/bootstrap.bundle.min.js"
+    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+    crossorigin="anonymous"></script>
+
+</body>
+
+</html>
