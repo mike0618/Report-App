@@ -34,12 +34,14 @@ var chart = new Chart(ctx, {
   }
 });
 
-document.addEventListener("htmx:afterSwap", function(event) {
-    if (event.detail.target.id === "chart-container") {
-        const response = JSON.parse(event.detail.xhr.response);
-        chart.data.labels = response.labels
-        chart.data.datasets[0].data = response.data
-        chart.data.datasets[1].data = response.data2
-        chart.update();
-    }
-});
+// SSE connection
+const eventSource = new EventSource("/stream");
+eventSource.onmessage = function(event){
+  const data = JSON.parse(event.data);
+  console.log("Received: ", data);
+  chart.data.labels = data.labels
+  chart.data.datasets[0].data = data.data
+  chart.data.datasets[1].data = data.data2
+  chart.update();
+};
+

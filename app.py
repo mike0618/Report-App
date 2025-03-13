@@ -1,12 +1,14 @@
 from datetime import datetime
+from time import sleep
+import json
 from random import randint
 from db_orm import app, db, User, Place, Sensor, Data, Share
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
 from db_orm import mqtt
 from flask import (
+    Response,
     flash,
-    jsonify,
     redirect,
     render_template,
     request,
@@ -21,7 +23,6 @@ from flask_login import (
     login_required,
 )
 from forms import (
-    PersonalFormAdmin,
     PlaceForm,
     RegisterForm,
     LoginForm,
@@ -64,30 +65,65 @@ def favicon():
 @app.route("/")
 def home():
     if not current_user.is_authenticated:
-        return redirect(url_for("signin"))
+        return redirect(url_for("sign"))
     return render_template("index.html")
 
 
-@app.route("/data")
-def data():
-    data = [randint(1, 100) for _ in range(7)]
-    data2 = [randint(1, 100) for _ in range(7)]
-    labels = [
-        "Sunday",
-        "Monday",
-        "Tuesday",
-        "Wednesday",
-        "Thursday",
-        "Friday",
-        "Saturday",
-    ]
-    return jsonify({"data": data, "data2": data2, "labels": labels})
+@app.route("/stream")
+@login_required
+def stream():
+    def event_stream():
+        with app.app_context():
+            while True:
+                data = [randint(1, 100) for _ in range(7)]
+                data2 = [randint(1, 100) for _ in range(7)]
+                labels = [
+                    "Sunday",
+                    "Monday",
+                    "Tuesday",
+                    "Wednesday",
+                    "Thursday",
+                    "Friday",
+                    "Saturday",
+                ]
+                yield f"data: {json.dumps({'data': data, 'data2': data2, 'labels': labels})}\n\n"
+                sleep(1)
+
+    return Response(
+        event_stream(), content_type="text/event-stream", mimetype="text/event-stream"
+    )
 
 
-# this route works with GET and POST methods
+@app.route("/sign")
+def sign():
+    return render_template("sign.html")
+
+
+@app.route("/signin", methods=["GET", "POST"])
+def signin():
+    form = LoginForm()
+    email = request.args.get("email")
+    if email:  # check if email was send in the link and add it to the form
+        form.email.data = email
+    if form.validate_on_submit():
+        # when validated, search user in the DB, and check the password
+        email = form.email.data
+        user = db.session.query(User).filter_by(email=email).first()
+        if not user:
+            flash("This account does not exist.", "error")
+            return redirect(url_for("sign"))
+        if not check_password_hash(user.password, str(form.password.data)):
+            flash("The password is wrong.", "error")
+            return redirect(url_for("sign"))
+        # if everything is ok, log in the user, and redirect to the home page
+        login_user(user)
+        return redirect(url_for("home"))
+    return render_template("signin.html", form=form)
+
+
 @app.route("/signup", methods=["GET", "POST"])
 def signup():
-    form = RegisterForm()  # use form from the forms module
+    form = RegisterForm()
     if form.validate_on_submit():  # when validated it comes via POST method
         email = form.email.data
         # check if email exists in the DB
@@ -96,7 +132,7 @@ def signup():
             flash("This account already exists. Try to login please.")
             print("This account already exists. Try to login please.")
             # offer to try login if exists
-            return redirect(url_for("login", email=email))
+            return redirect(url_for("sign", email=email))
         user_hash = generate_password_hash(
             str(form.password.data), method="pbkdf2:sha256", salt_length=16
         )  # create pw hash
@@ -113,35 +149,10 @@ def signup():
         login_user(new_user)
         # if registered and login successfully the user redirected to the personal page
         return redirect(url_for("home"))
-    # if it's GET method, register page opened with the form
     return render_template("signup.html", form=form)
 
 
-@app.route("/signin", methods=["GET", "POST"])
-def signin():
-    form = LoginForm()
-    email = request.args.get("email")
-    if email:  # check if email was send in the link and add it to the form
-        form.email.data = email
-    if form.validate_on_submit():
-        # when validated, search user in the DB, and check the password
-        email = form.email.data
-        user = db.session.query(User).filter_by(email=email).first()
-        if not user:
-            flash("This account does not exist.", "error")
-            return redirect(url_for("login"))
-        if not check_password_hash(user.password, str(form.password.data)):
-            flash("The password is wrong.", "error")
-            return redirect(url_for("login"))
-        # if everything is ok, log in the user, and redirect to the home page
-        login_user(user)
-        return redirect(url_for("home"))
-    # if it's GET, show login page with the form
-    return render_template("signin.html", form=form)
-
-
 @app.route("/logout")  # this is obviously a logout function
-@login_required
 def logout():
     logout_user()
     return redirect(url_for("home"))

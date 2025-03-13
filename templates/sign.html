@@ -1,0 +1,16 @@
+{%include "head.html"%}
+
+<body class="d-flex align-items-center py-4 bg-body-tertiary">
+  {%include "colormode.html"%}
+  <main id="main" class="form-signin w-100 m-auto">
+    <!-- <img class="mb-4" src="/docs/5.3/assets/brand/bootstrap-logo.svg" alt="" width="72" height="57"> -->
+    <div hx-get="{{url_for('signin')}}" hx-trigger="load" hx-swap="outerHTML"></div>
+    <p class="mt-5 mb-3 text-body-secondary">&copy; Miked PHREC WNCC 2024–{{year}}</p>
+  </main>
+  <script src="static/js/bootstrap.bundle.min.js"
+    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+    crossorigin="anonymous"></script>
+
+</body>
+
+</html>
