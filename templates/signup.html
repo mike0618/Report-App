@@ -1,7 +1,8 @@
 {% import "bootstrap/wtf.html" as wtf %}
 <div id="sign-container">
   <h1 class="h3 mb-3 fw-normal">Please sign up</h1>
-  {{ wtf.quick_form(form, action=url_for('signup'), novalidate=True, button_map={"submit": "success w-100"}) }}
+  {{ wtf.quick_form(form, action=url_for('signup'), button_map={"submit": "success
+  w-100"}) }}
   <hr>
   <h1 class="h3 mb-3 fw-normal">Already registered?</h1>
   <button class="btn btn-outline-primary w-100 py-2" hx-get="{{url_for('signin')}}" hx-target="#sign-container"

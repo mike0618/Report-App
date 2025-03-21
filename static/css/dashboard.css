@@ -4,6 +4,11 @@
   height: 1rem;
 }
 
+/*video {*/
+/*  max-height: 80vh;*/
+/*  object-fit: contain;*/
+/*}*/
+
 /*
  * Sidebar
  */
@@ -99,6 +104,10 @@
   -webkit-overflow-scrolling: touch;
 }
 
+.btn {
+  margin-top: 1rem;
+}
+
 .btn-bd-primary {
   --bd-violet-bg: #712cf9;
   --bd-violet-rgb: 112.520718, 44.062154, 249.437846;
@@ -123,3 +132,17 @@
 .bd-mode-toggle .dropdown-menu .active .bi {
   display: block !important;
 }
+#spinner-container {
+    position: fixed; /* Keep it in the same place on the screen */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1050; /* Make sure it's above other content, but below any modal or popup */
+}
+
+#spinner {
+    display: inline-block;
+    width: 3rem;
+    height: 3rem;
+}
+

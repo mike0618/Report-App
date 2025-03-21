@@ -1,0 +1,26 @@
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+  <h1 class="h2">{{sensor.name}}</h1>
+  <div class="btn-toolbar mb-2 mb-md-0">
+    <div class="btn-group">
+      <button type="button" class="btn btn-sm btn-outline-secondary">Share</button>
+      <button type="button" class="btn btn-sm btn-outline-secondary">Export</button>
+      <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle d-flex align-items-center gap-1">
+        <i class="fa-regular fa-calendar-days"></i>
+        This week
+      </button>
+    </div>
+    {% if current_user.id == 1 or current_user.id == sensor.owner_id %}
+    <div class="btn-group ms-2">
+      <button type="button" class="btn btn-sm btn-outline-secondary">Edit</button>
+      <button type="button" hx-delete="{{url_for('delete_sensor', sensor_id=sensor.id)}}"
+        hx-target="#sensor_{{sensor.id}}" hx-swap="outerHTML"
+        hx-on::after-request="htmx.ajax('GET', '{{ url_for('place', place_id=sensor.place_id) }}', { target: '#main' })"
+        hx-confirm="Are you sure you wish to delete this sensor?" class="btn btn-sm btn-outline-danger">Delete</button>
+    </div>
+    {% endif %}
+  </div>
+</div>
+<div id="chart-container">
+  <canvas class="my-4 w-100" id="myChart" width="900" height="380"></canvas>
+</div>
+<p>{{sensor.desc}}</p>

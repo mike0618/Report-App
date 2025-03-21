@@ -66,7 +66,22 @@ def favicon():
 def home():
     if not current_user.is_authenticated:
         return redirect(url_for("sign"))
-    return render_template("index.html")
+    places = db.session.query(Place).all()
+    return render_template("index.html", places=places)
+
+
+@app.route("/dashboard")
+def dashboard():
+    if not current_user.is_authenticated:
+        return redirect(url_for("sign"))
+    return render_template("dash.html")
+
+
+@app.route("/webrtc")
+def webrtc():
+    if not current_user.is_authenticated:
+        return redirect(url_for("sign"))
+    return render_template("webrtc.html")
 
 
 @app.route("/stream")
@@ -87,7 +102,7 @@ def stream():
                     "Saturday",
                 ]
                 yield f"data: {json.dumps({'data': data, 'data2': data2, 'labels': labels})}\n\n"
-                sleep(1)
+                sleep(10)
 
     return Response(
         event_stream(), content_type="text/event-stream", mimetype="text/event-stream"
@@ -117,6 +132,8 @@ def signin():
             return redirect(url_for("sign"))
         # if everything is ok, log in the user, and redirect to the home page
         login_user(user)
+        return redirect(url_for("home"))
+    if request.method == "POST":
         return redirect(url_for("home"))
     return render_template("signin.html", form=form)
 
@@ -149,6 +166,8 @@ def signup():
         login_user(new_user)
         # if registered and login successfully the user redirected to the personal page
         return redirect(url_for("home"))
+    if request.method == "POST":
+        return redirect(url_for("home"))
     return render_template("signup.html", form=form)
 
 
@@ -161,7 +180,7 @@ def logout():
 @app.route("/personal/edit", methods=["GET", "POST"])
 def edit_personal():  # edit personal data
     if not current_user.is_authenticated:
-        return redirect(url_for("login"))
+        return redirect(url_for("sign"))
     form = PersonalForm()
     if request.method != "POST":
         form.email.data = current_user.email
@@ -197,7 +216,7 @@ def edit_personal():  # edit personal data
 @app.route("/add_place", methods=["GET", "POST"])
 def add_place():
     if not current_user.is_authenticated:
-        return redirect(url_for("login"))
+        return redirect(url_for("sign"))
     form = PlaceForm()  # use form from the forms module
     if form.validate_on_submit():  # when validated it comes via POST method
         new_place = Place()
@@ -207,13 +226,30 @@ def add_place():
         new_place.date = datetime.now()
         new_place.owner = current_user
         new_place.save()
-    return redirect(url_for("home"))
+        return redirect(url_for("home"))
+    return render_template("add-place.html", form=form)
+
+
+@app.route("/place/<int:place_id>")
+def place(place_id):
+    if not current_user.is_authenticated:
+        return redirect(url_for("sign"))
+    place = db.get_or_404(Place, place_id)
+    return render_template("place.html", place=place)
+
+
+@app.route("/sensor/<int:sensor_id>")
+def sensor(sensor_id):
+    if not current_user.is_authenticated:
+        return redirect(url_for("sign"))
+    sensor = db.get_or_404(Sensor, sensor_id)
+    return render_template("sensor.html", sensor=sensor)
 
 
 @app.route("/<int:place_id>/add_sensor", methods=["GET", "POST"])
 def add_sensor(place_id):
     if not current_user.is_authenticated:
-        return redirect(url_for("login"))
+        return redirect(url_for("sign"))
     form = SensorForm()  # use form from the forms module
     if form.validate_on_submit():  # when validated it comes via POST method
         new_sensor = Sensor()
@@ -225,13 +261,14 @@ def add_sensor(place_id):
         new_sensor.owner = current_user
         new_sensor.place_id = place_id
         new_sensor.save()
-    return redirect(url_for("home"))
+        return redirect(url_for("home"))
+    return render_template("add-sensor.html", form=form, place_id=place_id)
 
 
 @app.route("/add_share/<sensor_id>/<user_id>", methods=["GET", "POST"])
 def add_share(sensor_id, user_id):
     if not current_user.is_authenticated:
-        return redirect(url_for("login"))
+        return redirect(url_for("sign"))
     sensor = db.get_or_404(Sensor, sensor_id)
     if sensor.owner == current_user or current_user.id == 1:
         new_share = Share()
@@ -243,7 +280,7 @@ def add_share(sensor_id, user_id):
     return redirect(url_for("home"))
 
 
-@app.route("/admin/user/<int:user_id>/delete")
+@app.route("/admin/user/<int:user_id>/delete", methods=["DELETE"])
 def delete_user(user_id):
     if not current_user.is_authenticated or current_user.id != 1:
         return redirect(url_for("home"))
@@ -253,36 +290,39 @@ def delete_user(user_id):
     return redirect(url_for("admin"))
 
 
-@app.route("/places/<int:place_id>/delete")
+@app.route("/places/<int:place_id>/delete", methods=["DELETE"])
 def delete_place(place_id):
     if not current_user.is_authenticated:
-        return redirect(url_for("login"))
+        return redirect(url_for("sign"))
     place = db.get_or_404(Place, place_id)
-    if not current_user.id == 1 or current_user == place.owner:
+    if current_user.id == 1 or current_user == place.owner:
         # admin or owner can do this
         place.delete()
+        return "", 200
     return redirect(url_for("home"))
 
 
-@app.route("/sensors/<int:sensor_id>/delete")
+@app.route("/sensors/<int:sensor_id>/delete", methods=["DELETE"])
 def delete_sensor(sensor_id):
     if not current_user.is_authenticated:
-        return redirect(url_for("login"))
+        return redirect(url_for("sign"))
     sensor = db.get_or_404(Sensor, sensor_id)
-    if not current_user.id == 1 or current_user == sensor.owner:
+    if current_user.id == 1 or current_user == sensor.owner:
         # admin or owner can do this
         sensor.delete()
+        return "", 200
     return redirect(url_for("home"))
 
 
-@app.route("/<int:share_id>/delete")
+@app.route("/<int:share_id>/delete", methods=["DELETE"])
 def delete_share(share_id):
     if not current_user.is_authenticated:
-        return redirect(url_for("login"))
+        return redirect(url_for("sign"))
     share = db.get_or_404(Share, share_id)
-    if not current_user.id == 1 or current_user == share.owner:
+    if current_user.id == 1 or current_user == share.owner:
         # admin or owner can do this
         share.delete()
+        return "", 200
     return redirect(url_for("home"))
 
 

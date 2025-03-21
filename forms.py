@@ -14,8 +14,10 @@ from wtforms.validators import DataRequired, Length
 
 # WTForm
 class CommonForm(FlaskForm):
-    name = StringField("Name", validators=[DataRequired()])
-    desc = StringField("Description")
+    name = StringField(
+        "Name", validators=[DataRequired()], render_kw={"placeholder": "Name"}
+    )
+    desc = StringField("Description", render_kw={"placeholder": "Description"})
 
 
 class RegisterForm(FlaskForm):
@@ -39,7 +41,9 @@ class PlaceForm(CommonForm):
 
 
 class SensorForm(CommonForm):
-    topic = StringField("MQTT Topic", validators=[DataRequired()])
+    topic = StringField(
+        "MQTT Topic", validators=[DataRequired()], render_kw={"placeholder": "Topic"}
+    )
     submit = SubmitField("Add")
 
 

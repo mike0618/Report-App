@@ -4,6 +4,16 @@
   {%include "colormode.html"%}
   <main id="main" class="form-signin w-100 m-auto">
     <!-- <img class="mb-4" src="/docs/5.3/assets/brand/bootstrap-logo.svg" alt="" width="72" height="57"> -->
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <div class="flashes">
+      {% for message in messages %}
+      <p class="text-danger">{{ message }}</p>
+      {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
     <div hx-get="{{url_for('signin')}}" hx-trigger="load" hx-swap="outerHTML"></div>
     <p class="mt-5 mb-3 text-body-secondary">&copy; Miked PHREC WNCC 2024–{{year}}</p>
   </main>

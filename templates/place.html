@@ -1,0 +1,27 @@
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+  <h1 class="h2">Place</h1>
+  <div class="btn-toolbar mb-2 mb-md-0">
+    <button type="button" hx-get="{{url_for('add_sensor', place_id=place.id)}}" hx-target="#main"
+      class="btn btn-sm btn-outline-success">Add Sensor</button>
+    {% if current_user.id == 1 or current_user.id == place.owner_id %}
+    <div class="btn-group ms-2">
+      <button type="button" class="btn btn-sm btn-outline-secondary">Edit</button>
+      <button type="button" hx-delete="{{url_for('delete_place', place_id=place.id)}}" hx-target="#place_{{place.id}}"
+        hx-swap="outerHTML"
+        hx-on::after-request="htmx.ajax('GET', '{{ url_for('dashboard') }}', { target: '#main', swap:'outerHTML' })"
+        hx-confirm="Are you sure you wish to delete this sensor?" class="btn btn-sm btn-outline-danger">Delete</button>
+    </div>
+    {% endif %}
+  </div>
+</div>
+<div id="container">
+  <h3>{{place.name}}</h3>
+  <p>{{place.desc}}</p>
+  <hr>
+  <h3>Sensors</h3>
+  {% for sensor in place.sensors %}
+  <p><a hx-get="{{url_for('sensor', sensor_id=sensor.id)}}" hx-target="#main" href="#">{{sensor.name}}</a> -
+    {{sensor.desc}} -
+    {{sensor.owner.name}}</p>
+  {% endfor %}
+</div>
