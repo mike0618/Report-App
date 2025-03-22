@@ -2,6 +2,15 @@
 {%include "header.html"%}
 {%include "sidebar.html"%}
 <div hx-get="{{url_for('dashboard')}}" hx-trigger="load" hx-swap="outerHTML"></div>
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+<div class="flashes">
+  {% for message in messages %}
+  <p class="text-danger">{{ message }}</p>
+  {% endfor %}
+</div>
+{% endif %}
+{% endwith %}
 </div>
 </div>
 {%include "footer.html"%}

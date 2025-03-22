@@ -41,7 +41,7 @@
                   <a class="nav-link align-items-right" hx-get="{{url_for('sensor', sensor_id=sensor.id)}}"
                     hx-target="#main" href="#">
                     <i class="fa-solid fa-chart-line"></i>
-                    {{sensor.name}}
+                    <span id="sname_{{sensor.id}}">{{sensor.name}}</span>
                   </a>
                 </li>
                 {% endfor %}

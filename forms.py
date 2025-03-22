@@ -37,14 +37,16 @@ class RegisterForm(FlaskForm):
 
 
 class PlaceForm(CommonForm):
-    submit = SubmitField("Add")
+    submit = SubmitField("Save")
 
 
 class SensorForm(CommonForm):
     topic = StringField(
-        "MQTT Topic", validators=[DataRequired()], render_kw={"placeholder": "Topic"}
+        "MQTT Topic",
+        validators=[DataRequired()],
+        render_kw={"placeholder": "MQTT Topic"},
     )
-    submit = SubmitField("Add")
+    submit = SubmitField("Save")
 
 
 class LoginForm(FlaskForm):

@@ -1,5 +1,5 @@
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-  <h1 class="h2">{{sensor.name}}</h1>
+  <h1 class="h2">Sensor: {{sensor.name}}</h1>
   <div class="btn-toolbar mb-2 mb-md-0">
     <div class="btn-group">
       <button type="button" class="btn btn-sm btn-outline-secondary">Share</button>
@@ -11,7 +11,8 @@
     </div>
     {% if current_user.id == 1 or current_user.id == sensor.owner_id %}
     <div class="btn-group ms-2">
-      <button type="button" class="btn btn-sm btn-outline-secondary">Edit</button>
+      <button type="button" hx-get="{{url_for('edit_sensor', sensor_id=sensor.id)}}" hx-target="#main"
+        class="btn btn-sm btn-outline-secondary">Edit</button>
       <button type="button" hx-delete="{{url_for('delete_sensor', sensor_id=sensor.id)}}"
         hx-target="#sensor_{{sensor.id}}" hx-swap="outerHTML"
         hx-on::after-request="htmx.ajax('GET', '{{ url_for('place', place_id=sensor.place_id) }}', { target: '#main' })"
@@ -23,4 +24,9 @@
 <div id="chart-container">
   <canvas class="my-4 w-100" id="myChart" width="900" height="380"></canvas>
 </div>
-<p>{{sensor.desc}}</p>
+<p>Topic: {{sensor.topic}}</p>
+<p>Description: {{sensor.desc}}</p>
+<p>Last Modified: {{sensor.date.date()}} {{sensor.date.time().strftime("%H:%M:%S")}}</p>
+<p>Owner: {{sensor.owner.name}} {{sensor.owner.lastname}}, <a
+    href="mailto://{{sensor.owner.email}}">{{sensor.owner.email}}</a>
+</p>

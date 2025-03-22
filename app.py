@@ -219,15 +219,39 @@ def add_place():
         return redirect(url_for("sign"))
     form = PlaceForm()  # use form from the forms module
     if form.validate_on_submit():  # when validated it comes via POST method
+        name = str(form.name.data)
+        if db.session.query(Place).filter_by(name=name).first():
+            flash("This place is already exist.", "error")
+            return redirect(url_for("home"))
         new_place = Place()
         # save the data from the form, hash and date
-        new_place.name = str(form.name.data)
+        new_place.name = name
         new_place.desc = str(form.desc.data)
         new_place.date = datetime.now()
         new_place.owner = current_user
         new_place.save()
         return redirect(url_for("home"))
     return render_template("add-place.html", form=form)
+
+
+@app.route("/edit_place/<int:place_id>", methods=["GET", "POST"])
+def edit_place(place_id):
+    if not current_user.is_authenticated:
+        return redirect(url_for("sign"))
+    form = PlaceForm()  # use form from the forms module
+    place = db.get_or_404(Place, place_id)
+    if request.method == "GET":
+        form.name.data = place.name
+        form.desc.data = place.desc
+    if form.validate_on_submit():  # when validated it comes via POST method
+        name = str(form.name.data)
+        if not db.session.query(Place).filter_by(name=name).first():
+            place.name = name
+        place.desc = str(form.desc.data)
+        place.date = datetime.now()
+        db.session.commit()
+        return redirect(url_for("home"))
+    return render_template("edit-place.html", form=form, place=place)
 
 
 @app.route("/place/<int:place_id>")
@@ -252,17 +276,49 @@ def add_sensor(place_id):
         return redirect(url_for("sign"))
     form = SensorForm()  # use form from the forms module
     if form.validate_on_submit():  # when validated it comes via POST method
+        topic = str(form.topic.data)
+        name = str(form.name.data)
+        if db.session.query(Sensor).filter_by(topic=topic).first():
+            flash("This topic is already exist.", "error")
+            return redirect(url_for("home"))
+        if db.session.query(Sensor).filter_by(name=name).first():
+            flash("This name is already exist.", "error")
+            return redirect(url_for("home"))
         new_sensor = Sensor()
         # save the data from the form, hash and date
-        new_sensor.name = str(form.name.data)
+        new_sensor.name = name
         new_sensor.desc = str(form.desc.data)
-        new_sensor.topic = str(form.topic.data)
+        new_sensor.topic = topic
         new_sensor.date = datetime.now()
         new_sensor.owner = current_user
         new_sensor.place_id = place_id
         new_sensor.save()
         return redirect(url_for("home"))
     return render_template("add-sensor.html", form=form, place_id=place_id)
+
+
+@app.route("/edit_sensor/<int:sensor_id>", methods=["GET", "POST"])
+def edit_sensor(sensor_id):
+    if not current_user.is_authenticated:
+        return redirect(url_for("sign"))
+    form = SensorForm()  # use form from the forms module
+    sensor = db.get_or_404(Sensor, sensor_id)
+    if request.method == "GET":
+        form.name.data = sensor.name
+        form.desc.data = sensor.desc
+        form.topic.data = sensor.topic
+    if form.validate_on_submit():  # when validated it comes via POST method
+        name = str(form.name.data)
+        topic = str(form.topic.data)
+        if not db.session.query(Sensor).filter_by(name=name).first():
+            sensor.name = name
+        if not db.session.query(Sensor).filter_by(topic=topic).first():
+            sensor.topic = topic
+        sensor.desc = str(form.desc.data)
+        sensor.date = datetime.now()
+        db.session.commit()
+        return redirect(url_for("home"))
+    return render_template("edit-sensor.html", form=form, sensor=sensor)
 
 
 @app.route("/add_share/<sensor_id>/<user_id>", methods=["GET", "POST"])
