@@ -83,15 +83,14 @@
 
           <ul class="nav flex-column mb-auto">
             <li class="nav-item">
-              {% if current_user.is_authenticated and current_user.id == 1 %}
-              <a class="nav-link d-flex align-items-center gap-2" href="#">
+              {% if current_user.is_authenticated %}
+              <a class="nav-link d-flex align-items-center gap-2" hx-get="{{url_for('edit_personal')}}"
+                hx-target="#main" href="#">
                 <i class="fa-solid fa-user-gear"></i>
-                Settings
+                My Page
               </a>
-              {% endif %}
             </li>
             <li class="nav-item">
-              {% if current_user.is_authenticated %}
               <a class="nav-link d-flex align-items-center gap-2" href="{{ url_for('logout') }}">
                 <i class="fa-solid fa-arrow-right-from-bracket"></i>
                 Sign out

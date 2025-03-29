@@ -186,12 +186,10 @@ def edit_personal():  # edit personal data
         form.email.data = current_user.email
         form.name.data = current_user.name
         form.lastname.data = current_user.lastname
-        form.desc.data = current_user.desc
     if form.validate_on_submit():
         email = form.email.data
         current_user.name = form.name.data
         current_user.lastname = form.lastname.data
-        current_user.desc = form.desc.data
         if email != current_user.email:
             # if email changed, check whether it exists in the DB
             if db.session.query(User).filter_by(email=email).first():
@@ -209,7 +207,7 @@ def edit_personal():  # edit personal data
             flash("Your password changed")
         # if everything is ok, perform UPDATE and commit
         db.session.commit()
-        return redirect(url_for("personal"))
+        return redirect(url_for("home"))
     return render_template("edit-personal.html", form=form)
 
 
@@ -336,14 +334,16 @@ def add_share(sensor_id, user_id):
     return redirect(url_for("home"))
 
 
-@app.route("/admin/user/<int:user_id>/delete", methods=["DELETE"])
+@app.route("/user/<int:user_id>/delete", methods=["DELETE"])
 def delete_user(user_id):
-    if not current_user.is_authenticated or current_user.id != 1:
+    if not current_user.is_authenticated or current_user.id not in (1, user_id):
         return redirect(url_for("home"))
-    # only is_authenticated admin can do this
+    # only authenticated admin or owner can do this
     user = db.get_or_404(User, user_id)
+    if current_user.id == user_id:
+        logout_user()
     user.delete()
-    return redirect(url_for("admin"))
+    return Response(headers={"HX-Refresh": "true"}), 204
 
 
 @app.route("/places/<int:place_id>/delete", methods=["DELETE"])

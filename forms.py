@@ -59,13 +59,21 @@ class LoginForm(FlaskForm):
     submit = SubmitField("Sign in")
 
 
-class PersonalForm(CommonForm):
-    email = StringField("Email", validators=[DataRequired()])
-    lastname = StringField("Last Name")
-    old_password = PasswordField(
-        "Old Password (leave it blank if you don't need to change)"
+class PersonalForm(FlaskForm):
+    email = StringField(
+        "Email", validators=[DataRequired()], render_kw={"placeholder": "Email"}
     )
-    new_password = PasswordField("New Password")
+    name = StringField(
+        "Name", validators=[DataRequired()], render_kw={"placeholder": "Name"}
+    )
+    lastname = StringField("Last Name", render_kw={"placeholder": "Last Name"})
+    old_password = PasswordField(
+        "Old Password (leave it blank if you don't need to change)",
+        render_kw={"placeholder": "Old Password"},
+    )
+    new_password = PasswordField(
+        "New Password", render_kw={"placeholder": "New Password"}
+    )
     submit = SubmitField("Save")
 
 
