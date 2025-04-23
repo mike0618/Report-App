@@ -12,7 +12,16 @@
       </button>
     </div>
   </div>
-  <div id="chart-container">
-    <canvas class="my-4 w-100" id="myChart1" width="900" height="380"></canvas>
+  <div id="container">
+    {% for sensor in current_user.sensors %}
+    <h3>{{ sensor.name }}</h3>
+    <p>Value1: {{ sensor.data.val1 }}</p>
+    <p>Value2: {{ sensor.data.val2 }}</p>
+    <p>Battery: {{ sensor.data.battery }}</p>
+    <p>Solar Panel: {{ sensor.data.solar }}</p>
+    <p>Signal: {{ sensor.data.signal }}</p>
+    <p>Boot Count: {{ sensor.data.bcount }}</p>
+    {% endfor %}
   </div>
+  <div hx-get="{{url_for('dashboard')}}" hx-target="#main" hx-trigger="every 5s" hx-swap="outerHTML"></div>
 </main>
