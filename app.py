@@ -30,11 +30,33 @@ from forms import (
     SensorForm,
 )
 
+# subscribe on topics
+with app.app_context():
+    sensors = db.session.query(Sensor).all()
+    for s in sensors:
+        mqtt.subscribe(s.topic)
+
 
 @mqtt.on_message()
 def on_message(client, userdata, message):
-    print(message.topic)
-    print(message.payload.decode())
+    with app.app_context():
+        sensor = db.session.query(Sensor).filter_by(topic=message.topic).first()
+        if not sensor:
+            return False
+        payload = json.loads(message.payload.decode())
+        if not payload:
+            return False
+        print(payload)
+        data = Data()
+        data.val1 = float(payload.get("val1"))
+        data.val2 = float(payload.get("val2"))
+        data.battery = int(payload.get("bat"))
+        data.solar = int(payload.get("sol"))
+        data.signal = int(payload.get("sig"))
+        data.bcount = int(payload.get("bc"))
+        data.sensor_id = sensor.id
+        data.date = datetime.now()
+        data.save()
 
 
 login_manager = LoginManager()
@@ -383,4 +405,4 @@ def delete_share(share_id):
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", debug=True)
+    app.run(host="0.0.0.0", debug=False)

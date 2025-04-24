@@ -15,12 +15,14 @@
   <div id="container">
     {% for sensor in current_user.sensors %}
     <h3>{{ sensor.name }}</h3>
-    <p>Value1: {{ sensor.data.val1 }}</p>
-    <p>Value2: {{ sensor.data.val2 }}</p>
-    <p>Battery: {{ sensor.data.battery }}</p>
-    <p>Solar Panel: {{ sensor.data.solar }}</p>
-    <p>Signal: {{ sensor.data.signal }}</p>
-    <p>Boot Count: {{ sensor.data.bcount }}</p>
+    {%if sensor.data%}
+    <p>Value1: {{ sensor.data[-1].val1 }}</p>
+    <p>Value2: {{ sensor.data[-1].val2 }}</p>
+    <p>Battery: {{ sensor.data[-1].battery }}</p>
+    <p>Solar Panel: {{ sensor.data[-1].solar }}</p>
+    <p>Signal: {{ sensor.data[-1].signal }}</p>
+    <p>Boot Count: {{ sensor.data[-1].bcount }}</p>
+    {% endif %}
     {% endfor %}
   </div>
   <div hx-get="{{url_for('dashboard')}}" hx-target="#main" hx-trigger="every 5s" hx-swap="outerHTML"></div>

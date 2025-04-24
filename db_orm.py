@@ -66,12 +66,11 @@ app.secret_key = token_hex()  # a random session secret key
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///data_app.sqlite"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False  # To prevent overhead
 app.config["MQTT_USERNAME"] = "lilygo"
-app.config["MQTT_PASSWORD"] = "lilygo7000"
+app.config["MQTT_PASSWORD"] = "lilygo"
 app.config["MQTT_TLS_ENABLED"] = False
 Bootstrap(app)  # to use bootstrap in html pages
 ckeditor = CKEditor(app)  # to use a text editor in html pages
 mqtt = Mqtt(app)
-mqtt.subscribe("lil2/data")
 
 
 class Base(DeclarativeBase): ...  # some advanced config for db here if needed
