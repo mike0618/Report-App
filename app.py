@@ -126,9 +126,7 @@ def stream():
                 yield f"data: {json.dumps({'data': data, 'data2': data2, 'labels': labels})}\n\n"
                 sleep(10)
 
-    return Response(
-        event_stream(), content_type="text/event-stream", mimetype="text/event-stream"
-    )
+    return Response(event_stream(), content_type="text/event-stream", mimetype="text/event-stream")
 
 
 @app.route("/sign")
